@@ -25,8 +25,9 @@ class Data_digits():
         plt.show()
 
     def vector_image(self):
-        v = []
-        [v.append(self.d[i].reshape(64,1)) for i in range(8)]
+        #v = []
+        #[v.append(self.d[i].reshape(64,1)) for i in range(8)]
+        v = [self.d[i].reshape(64,1) for i in range(8)]
         plt.figure(figsize=(8, 3))
         for i in range(8):
             plt.subplot(1, 8, i + 1)
