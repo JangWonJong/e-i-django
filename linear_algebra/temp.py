@@ -1,10 +1,10 @@
 import numpy as np
 import pandas as pd
-import requests
+
 
 import matplotlib.pyplot as plt
 
-class Thermo(object):
+class Temp(object):
     def __init__(self):
         url = "https://raw.githubusercontent.com/reisanar/datasets/master/ozone.data.csv"
         self.df = pd.read_csv(url)
@@ -59,4 +59,4 @@ class Thermo(object):
         plt.show()
 
 if __name__ == '__main__':
-    Thermo().solution()
+    Temp().solution()
