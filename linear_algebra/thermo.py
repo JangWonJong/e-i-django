@@ -1,41 +1,62 @@
 import numpy as np
 import pandas as pd
+import requests
+
 import matplotlib.pyplot as plt
-from sklearn import linear_model
 
-# 1. Raw Data Loading
-df = pd.read_csv('./data/ozone.csv')
+class Thermo(object):
+    def __init__(self):
+        url = "https://raw.githubusercontent.com/reisanar/datasets/master/ozone.data.csv"
+        self.df = pd.read_csv(url)
+        self.training_data = self.df[['temp', 'ozone']]
+        self.x_data = self.training_data['temp'].values.reshape(-1, 1)
+        self.t_data = self.training_data['ozone'].values.reshape(-1, 1)
+        self.W = np.random.rand(1, 1)
+        self.b = np.random.rand(1)
 
-# 2. Data Preprocessing
-training_data = df[['Temp', 'Ozone']]
 
-training_data = training_data.dropna(how='any')
+    def loss_func(self, x, t):
+        y = np.dot(x, self.W) + self.b
+        return np.mean(np.power((t - y), 2))  # 최소제곱법
 
-# 3. Training Data Set
-x_data = training_data['Temp'].values.reshape(-1,1)
-t_data = training_data['Ozone'].values.reshape(-1,1)
+    @staticmethod
+    def numerical_derivative(f, x):
+        delta_x = 1e-4
+        derivative_x = np.zeros_like(x)
+        it = np.nditer(x, flags=['multi_index'])
 
-# 4. sklearn을 이용해서 linear regression model 객체를 생성
-# 아직 완성되지 않은(학습되지 않은) 모델을 일단 생성
-model = linear_model.LinearRegression()
+        while not it.finished:
+            idx = it.multi_index  # iterator의 현재 index를 tuple 형태로 추출
+            tmp = x[idx]
+            x[idx] = tmp + delta_x
+            fx_plus_delta = f(x)  # f(x + delta_x)
+            x[idx] = tmp - delta_x
+            fx_minus_delta = f(x)  # f(x - delta_x)
+            derivative_x[idx] = (fx_plus_delta - fx_minus_delta) / (2 * delta_x)
+            x[idx] = tmp
+            it.iternext()
 
-# 5. Training Data Set을 이용해서 학습 진행
-# fit() 함수를 이용
-model.fit(x_data, t_data)
+        return derivative_x
 
-# 6. W와 b값을 알아내보자
-# model.coef_ : W / model.intercept_ : b
-print('W : {}, b : {}'.format(model.coef_, model.intercept_))
-# W : [[2.4287033]], b : [-146.99549097]
+    def predict(self, x):
+        return np.dot(x, self.W) + self.b
 
-# 7. 예측 수행
-predict_val = model.predict([[62]])   # 온도를 이용해서 오존량 예측
-print(predict_val)   # [[3.58411393]]
+    def solution(self):
+        learning_rate = 1e-5
+        f = lambda x: self.loss_func(self.x_data, self.t_data)
 
-# 8. 그래프로 확인해보자
-plt.scatter(x_data, t_data)
-plt.plot(x_data, np.dot(x_data, model.coef_) + model.intercept_, color='r')
-plt.show()
+        for step in range(90000):
+            self.W -= learning_rate * self.numerical_derivative(f, self.W)
+            self.b -= learning_rate * self.numerical_derivative(f, self.b)
+
+            if step % 9000 == 0:
+                print('W : {}, b : {}, loss : {}'.format(self.W, self.b, self.loss_func(self.x_data, self.t_data)))
+
+        result = self.predict(62)
+        print(result)  # [[34.56270003]]
+        plt.scatter(self.x_data, self.t_data)
+        plt.plot(self.x_data, np.dot(self.x_data, self.W) + self.b, color='r')
+        plt.show()
 
 if __name__ == '__main__':
-    pass
+    Thermo().solution()
