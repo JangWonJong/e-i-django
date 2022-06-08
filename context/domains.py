@@ -111,10 +111,7 @@ class Reader(ReaderBase):
     def gmaps(self) -> object:
         return googlemaps.Client(key='')
 
-
-
-class Printer(PrinterBase):
-    def dframe(self, this):
+    def myprint(self, this):
         print('*' * 100)
         print(f'1. Target type \n {type(this)} ')
         print(f'2. Target column \n {this.columns} ')
@@ -122,3 +119,6 @@ class Printer(PrinterBase):
         print(f'4. Target bottom 1개 행\n {this.tail(1)} ')
         print(f'4. Target null 의 갯수\n {this.isnull().sum()}개')
         print('*' * 100)
+
+class Printer(PrinterBase):
+    pass
