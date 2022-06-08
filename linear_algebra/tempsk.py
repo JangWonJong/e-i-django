@@ -3,10 +3,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn import linear_model
 
+from context.domains import Reader
+
+
 class Tempsk():
     def __init__(self):
         url = "https://raw.githubusercontent.com/reisanar/datasets/master/ozone.data.csv"
-        self.df = pd.read_csv(url)
+        self.df = Reader().csv(url)
+        #self.df = pd.read_csv(url)
         self.training_data = self.df[['temp', 'ozone']]
         self.training_data = self.training_data.dropna(how='any')
         self.x_data = self.training_data['temp'].values.reshape(-1, 1)
