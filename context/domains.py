@@ -45,9 +45,33 @@ class Dataset:
     @label.setter
     def label(self,label): self._label = label
 
+@dataclass
+class File(object):
+    context: str
+    fname: str
+    dframe: object
+
+    @property
+    def context(self) -> str: return self._context
+
+    @context.setter
+    def context(self, context): self._context = context
+
+    @property
+    def fname(self) -> str: return self._fname
+
+    @fname.setter
+    def fname(self, fname): self._fname = fname
+
+    @property
+    def dframe(self) -> str: return self._dframe
+
+    @dframe.setter
+    def dframe(self, dframe): self._dframe = dframe
+
 class PrinterBase(metaclass=ABCMeta):
     @abstractmethod
-    def dframe(self):
+    def dframe(self, this):
         pass
 
 # new_file, csv, xls, json
@@ -57,35 +81,44 @@ class ReaderBase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def csv(self, file):
+    def csv(self, fname):
         pass
 
     @abstractmethod
-    def xls(self, file):
+    def xls(self, fname, header, cols):
         pass
 
     @abstractmethod
-    def json(self, file):
+    def json(self, fname):
         pass
 
 #Reader class
 #Printer class
-class Printer(PrinterBase):
-    def dframe(self):
-        pass
 
 class Reader(ReaderBase):
-    def new_file(self, file)-> str:
+    def new_file(self,file) -> str:
         return file.context + file.fname
 
     def csv(self, file) -> object:
-        return pd.read_csv(f'{self.new_file(file)}', encoding='utf-8', thousands=',')
+        return pd.read_csv(f'{self.new_file(file)}.csv', encoding='UTF-8', thousands=',')
 
     def xls(self, file, header, cols) -> object:
-        return pd.read_excel(f'{self.new_file(file)}', header=header, usecols=cols,sheet_name="")
+        return pd.read_excel(f'{self.new_file(file)}.xls', header=header, usecols=cols,sheet_name="")
 
     def json(self, file) -> object:
-        return pd.read_json(f'{self.new_file(file)}', encoding='utf-8')
+        return pd.read_json(f'{self.new_file(file)}.json', encoding='UTF-8')
 
-    def gmaps(self)->object:
-        return googlemaps
+    def gmaps(self) -> object:
+        return googlemaps.Client(key='')
+
+
+
+class Printer(PrinterBase):
+    def dframe(self, this):
+        print('*' * 100)
+        print(f'1. Target type \n {type(this)} ')
+        print(f'2. Target column \n {this.columns} ')
+        print(f'3. Target top 1개 행\n {this.head(1)} ')
+        print(f'4. Target bottom 1개 행\n {this.tail(1)} ')
+        print(f'4. Target null 의 갯수\n {this.isnull().sum()}개')
+        print('*' * 100)
