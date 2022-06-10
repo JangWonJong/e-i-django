@@ -94,10 +94,23 @@ class Solution(Reader):
         self.file.fname = 'us_unemployment'
         unemployment = self.csv(self.file)
 
-        bins = list(states["Unemployment"].quantitle(0, 0.25, 0.5, 0.75, 1))
+        bins = list(unemployment["Unemployment"].quantile([0, 0.25, 0.5, 0.75, 1]))
+        m = folium.Map(location=[48, -102], zoom_start=5)
+        folium.Choropleth(
+            geo_data='./data/us-states.json',
+            name="choropleth",
+            data=unemployment,
+            columns=["State", "Unemployment"],
+            key_on="feature.id",
+            fill_color="YlGn",
+            fill_opacity=0.7,
+            line_opacity=0.5,
+            legend_name="Unemployment Rate (%)",
+            bins= bins,
+            reset=True
+        ).add_to(m)
 
-        #m = folium.Map(location=[37.60388169879458, 127.04001571848704])
-        #m.save("./save/folium_test.html")
+        m.save("./save/folium_test.html")
 
 
     def draw_crime_map(self):
