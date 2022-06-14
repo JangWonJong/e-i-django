@@ -32,6 +32,8 @@ class Solution(Reader):
             print('3. Token Embedding.')
             print('4. Document Embedding.')
             print('5. 2018년 삼성사업계획서를 분석해서 워드클라우드를 작성하시오.')
+            print('6. Read stopwords.txt .')
+            print('7. Read remove_stopword.txt .')
             print('9. nltk 다운로드.')
             return input('메뉴 선택 \n')
 
@@ -49,6 +51,10 @@ class Solution(Reader):
                 self.document_embedding()
             elif menu == '5':
                 self.draw_wordcloud()
+            elif menu == '6':
+                self.read_stopword()
+            elif menu == '7':
+                self.remove_stopword()
             elif menu == '9':
                 Solution().download()
             elif menu == '0':
@@ -58,31 +64,46 @@ class Solution(Reader):
         nltk.download('punkt')
 
     def preprocessing(self):
+        self.okt.pos("삼성전자 글로벌센터 전자사업부", stem=True)
         file = self.file
         file.fname = 'kr-Report_2018.txt'
         textf = self.new_file(file)
-        self.okt.pos("삼성전자 글로벌센터 전자사업부", stem=True)
         with open(textf, 'r', encoding='UTF-8') as f:
             texts = f.read()
-        temp = texts.replace('\n', ' ')
-        ic(texts)
-        return texts
+        texts = texts.replace('\n', ' ')
+        tokenizer = re.compile(r'[^ㄱ-힣]+')
+        return tokenizer.sub(' ', texts)
 
     def tokenization(self):
-        texts = self.preprocessing() # 토큰화
-        tokenizer = re.compile(r'[ㄱ-힣]+') #ㄱ부터 힣까지  한글만 남겨라
-        texts = tokenizer.sub('', texts)
-        texts = word_tokenize(texts)
-        ic(texts)
+        #texts = self.preprocessing() # 토큰화
+        #tokenizer = re.compile(r'[ㄱ-힣]+') #ㄱ부터 힣까지  한글만 남겨라
         noun_tokens = []
-        tokens = word_tokenize(texts)
+        tokens = word_tokenize(self.preprocessing())
+        #ic(tokens[:100])
         for i in tokens:
             pos = self.okt.pos(i)
             _= [j[0] for j in pos if j[1] == 'Noun']
             if len(''.join(_)) >1:
                 noun_tokens.append(''.join(_))
         texts = ' '.join(noun_tokens)
-        ic(texts[:50])
+        #ic(texts[:100])
+        return texts
+
+    def read_stopword(self):
+        self.okt.pos("삼성전자 글로벌센터 전자사업부", stem=True)
+        file = self.file
+        file.fname = 'stopwords.txt'
+        sword = self.new_file(file)
+        with open(sword, 'r', encoding='UTF-8') as f:
+            texts = f.read()
+        #ic(texts)
+        return texts
+
+    def remove_stopword(self):
+        tokens = self.tokenization()
+        stopwords = self.read_stopword()
+        texts = [i for i in tokens.split() if not i in stopwords.split()]
+        ic(texts)
 
     def token_embedding(self):
         pass
