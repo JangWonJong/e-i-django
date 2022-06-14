@@ -32,38 +32,57 @@ class Solution(Reader):
             print('3. Token Embedding.')
             print('4. Document Embedding.')
             print('5. 2018년 삼성사업계획서를 분석해서 워드클라우드를 작성하시오.')
+            print('9. nltk 다운로드.')
             return input('메뉴 선택 \n')
 
-            while 1:
-                menu = print_menu()
-                if menu == '0':
-                    break
-                if menu == '1':
-                    self.preprocessing()
-                if menu == '2':
-                    self.tokenization()
-                if menu == '3':
-                    self.token_embedding()
-                if menu == '4':
-                    self.document_embedding()
-                if menu == '5':
-                    self.draw_wordcloud()
-                elif menu == '0':
-                    break
-
+        while 1:
+            menu = print_menu()
+            if menu == '0':
+                break
+            if menu == '1':
+                self.preprocessing()
+            elif menu == '2':
+                self.tokenization()
+            elif menu == '3':
+                self.token_embedding()
+            elif menu == '4':
+                self.document_embedding()
+            elif menu == '5':
+                self.draw_wordcloud()
+            elif menu == '9':
+                Solution().download()
+            elif menu == '0':
+                break
+    @staticmethod
+    def download():
+        nltk.download('punkt')
 
     def preprocessing(self):
         file = self.file
         file.fname = 'kr-Report_2018.txt'
-        file = self.new_file(file)
+        textf = self.new_file(file)
         self.okt.pos("삼성전자 글로벌센터 전자사업부", stem=True)
-        with open(file, 'r', encoding='UTF-8') as f:
+        with open(textf, 'r', encoding='UTF-8') as f:
             texts = f.read()
+        temp = texts.replace('\n', ' ')
         ic(texts)
         return texts
 
     def tokenization(self):
-        pass
+        texts = self.preprocessing() # 토큰화
+        tokenizer = re.compile(r'[ㄱ-힣]+') #ㄱ부터 힣까지  한글만 남겨라
+        texts = tokenizer.sub('', texts)
+        texts = word_tokenize(texts)
+        ic(texts)
+        noun_tokens = []
+        tokens = word_tokenize(texts)
+        for i in tokens:
+            pos = self.okt.pos(i)
+            _= [j[0] for j in pos if j[1] == 'Noun']
+            if len(''.join(_)) >1:
+                noun_tokens.append(''.join(_))
+        texts = ' '.join(noun_tokens)
+        ic(texts[:50])
 
     def token_embedding(self):
         pass
