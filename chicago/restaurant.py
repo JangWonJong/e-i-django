@@ -41,7 +41,6 @@ class Solution(Reader):
                 break
 
 
-
     def preprocessing(self):
         req = Request(self.url, headers={'User-Agent': 'Mozilla/5.0'})
         html = urlopen(req)
