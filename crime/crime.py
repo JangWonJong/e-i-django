@@ -290,10 +290,25 @@ class Solution(Reader):
 
 
     def draw_crime_map(self):
+        # 서울시 지도 geo_simple.json
         file = self.file
+        file.fname = 'geo_simple'
+        seoul_map = self.map_json(file)
+
+        # 검거율 정규화 데이터 police_norm.csv
+        file.fname = 'police_norm'
+        file.context = './save/'
+        police_norm = self.csv(file)
+
+        # 범죄현황 데이터 crime_in_seoul.csv
         file.fname = 'crime_in_seoul'
+        file.context = './data/'
         crime = self.csv(file)
-        self.file.fname = 'geo_simple'
+
+        # 경찰서위치 police_pos.csv
+        file.fname = 'police_pos'
+        file.context = './save/'
+        police_pos = self.csv(file)
 
         station_names = []
         for name in crime['관서명']:
@@ -301,22 +316,46 @@ class Solution(Reader):
         # print(f'station_names range: {len(station_names)}')
         for i, name in enumerate(station_names):
             print(f'name {i} {name}')
-        gmaps = self.gmaps()
 
+        gmaps = self.gmaps()
         station_addrs = []
         station_lats = []
         station_lngs = []
+
         for i, name in enumerate(station_names):
             if name != '서울종암경찰서':
                 temp = gmaps.geocode(name, language='ko')
             else:
                 temp = self.jongampolice()
-
             station_addrs.append(temp[0].get('formatted_address'))
             t_loc = temp[0].get('geometry')
             station_lats.append(t_loc['location']['lat'])
             station_lngs.append(t_loc['location']['lng'])
 
+        police_pos['lat'] = station_lats
+        police_pos['lng'] = station_lngs
+        col = ['살인 검거', '강도 검거', '강간 검거', '절도 검거', '폭력 검거']
+        tmp = police_pos[col] / police_pos[col].max()
+        police_pos['검거'] = np.sum(tmp, axis=1)
+        folium_map = folium.Map(location=[37.5502, 126.982], zoom_start=12, title='Stamen Toner')
+
+        folium.Choropleth(
+            geo_data=seoul_map,
+            data=tuple(zip(police_norm['구별'], police_norm['범죄'])),
+            columns=["State", "Crime Rate"],
+            key_on="feature.id",
+            fill_color="PuRd",
+            fill_opacity=0.7,
+            line_opacity=0.2,
+            legend_name="Crime Rate (%)",
+            reset=True,
+        ).add_to(folium_map)
+        for i in police_pos.index:
+            folium.CircleMarker([police_pos['lat'][i], police_pos['lng'][i]],
+                                radius=police_pos['검거'][i] * 10,
+                                fill_color='#0a0a32').add_to(folium_map)
+
+        folium_map.save('./save/crime_map.html')
 
     def jongampolice(self):
         return [{'address_components': [{'long_name': '2 3', 'short_name': '2 ３', 'types': ['premise']},
@@ -341,8 +380,3 @@ class Solution(Reader):
 
 if __name__ == '__main__':
     Solution().hook()
-    #Solution().save_police_pos()
-    #Solution().save_police_pos3()
-    #Solution().save_cctv_pos()
-    #Solution().folium_test()
-    #Solution().draw_crime_map()
