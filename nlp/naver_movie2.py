@@ -47,8 +47,8 @@ class Solution(Reader):
             elif menu == '2':
                 self.preprocess()
             elif menu == '3':
-                ic(self.naiveBayesClassifier('너무 좋아요, 내 인생의 최고의 명작 영화'))
-                ic(self.naiveBayesClassifier('이렇게 졸린 영화는 처음이야'))
+                self.naiveBayesClassifier('너무 좋아요, 내 인생의 최고의 명작 영화')
+                self.naiveBayesClassifier('다신 안봄')
 
 
     def preprocess(self):
@@ -189,8 +189,7 @@ class Solution(Reader):
         file.context = './save/'
         file.fname = 'movie_reviews.txt'
         corpus = pd.read_table(self.new_file(file), names=['title', 'point', 'doc', 'label'])
-        corpus.drop(columns={corpus.columns[0],
-                           corpus.columns[3]}, inplace=True)
+        corpus.drop(columns=['title', 'label']   , inplace=True)
         corpus = corpus[['doc', 'point']]
         corpus = np.array(corpus)
         return corpus
@@ -203,7 +202,7 @@ class Solution(Reader):
                 # 리뷰를 띄어쓰기 단위로 토크나이징
                 words = doc.split()
                 for word in words:
-                    counts[word][0 if point > 7.0 else 1] += 1
+                    counts[word][0 if point > 8 else 1] += 1
         return counts
 
     def isNumber(self, s):
@@ -217,7 +216,7 @@ class Solution(Reader):
         print('-------------- 훈련 시작 --------')
         training_set = self.load_corpus()
         # 범주0 (긍정) 과 범주1(부정) 문서의 수를 세어줌
-        num_class0 = len([1 for _, point in training_set if point > 3.5])
+        num_class0 = len([1 for _, point in training_set if point > 8])
         num_class1 = len(training_set) - num_class0
         # train
         word_counts = self.count_word(training_set)
@@ -252,7 +251,7 @@ class Solution(Reader):
         return prob_if_class0 / (prob_if_class0 + prob_if_class1)
 
     def classify(self, doc):
-        return self.class0_probabilities(self.word_probs, doc)
+        print(self.class0_probabilities(self.word_probs, doc))
 
 if __name__ == '__main__':
     Solution().hook()
