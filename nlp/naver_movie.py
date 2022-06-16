@@ -148,7 +148,11 @@ class Solution(Reader):
                      verticalalignment='bottom')
         plt.show()
 
-    def rating_distribution(self, avg_score ,top10_reviews):
+    def rating_distribution(self):
+
+        top10_reviews = self.visualize()
+        avg_score = self.visualize()
+        self.visualize()
         fig, axs = plt.subplots(5, 2, figsize=(15, 25))
         axs = axs.flatten()
         for title, avg, ax in zip(avg_score.keys(), avg_score.values(), axs):
