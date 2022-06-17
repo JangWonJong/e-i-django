@@ -23,7 +23,7 @@ class Solution(Reader):
         def print_menu():
             print('0. Exit')
             print('1. preprocessing.')
-            print('2. abc.')
+            print('2. filter.')
             print('3. map.')
             return input('메뉴 선택 \n')
 
@@ -57,7 +57,6 @@ class Solution(Reader):
             main_menu.append(re.split(('\n|\r\n'), tmp_string)[0])
             cafe_name.append(re.split(('\n|\r\n'), tmp_string)[1])
             url_add.append(urljoin(self.url_base, item.find('a')['href']))
-
         data = {'Rank': rank, 'Menu': main_menu, 'Cafe': cafe_name, 'URL': url_add}
         df = pd.DataFrame(data, columns=['Rank', 'Cafe', 'Menu', 'URL'])
         df.head()
