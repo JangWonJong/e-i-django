@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import tensorflow as tf
+from icecream import ic
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -75,9 +76,8 @@ class UseModel:
         return result
 
 if __name__ == '__main__':
-    num1 = 5
-    num2 = 5
-    opcode = '*'
-    print(UseModel().calc(num1, num2, opcode))
+
+
+    ic(UseModel().calc(num1=5, num2=5, opcode='*'))
 
 
