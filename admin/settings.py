@@ -77,11 +77,11 @@ WSGI_APPLICATION = 'admin.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # mysqlclient librarly 설치
-        'NAME': 'mibotdb',
+        'NAME': 'eisdb',
         'USER': 'root',
         'PASSWORD': 'root',
         'HOST': 'localhost',
-        'PORT': '3307'
+        'PORT': '3308'
     }
 }
 
