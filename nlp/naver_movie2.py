@@ -67,6 +67,7 @@ class Solution(Reader):
 
 
 
+
     def crawling(self):
 
         file = self.file
@@ -142,9 +143,9 @@ class Solution(Reader):
                      horizontalalignment='center',
                      verticalalignment='bottom')
 
-        # plt.show()
-        # self.rating_distribution(top10, avg_score)
-        self.circle_chart(top10, avg_score)
+        plt.show()
+        self.rating_distribution(top10, avg_score)
+        self.circle_chart(top10,avg_score)
 
     def rating_distribution(self,top10, avg_score):
         fig, axs = plt.subplots(5, 2, figsize=(15, 25))
