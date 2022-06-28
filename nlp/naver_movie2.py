@@ -1,8 +1,12 @@
 import urllib.request
 from collections import defaultdict
+import nltk
+from nltk import word_tokenize, FreqDist
 
 from bs4 import BeautifulSoup
 from pandas import read_table
+from wordcloud import WordCloud
+
 from context.domains import Reader, File
 from icecream import ic
 import pandas as pd
@@ -143,9 +147,9 @@ class Solution(Reader):
                      horizontalalignment='center',
                      verticalalignment='bottom')
 
-        plt.show()
         self.rating_distribution(top10, avg_score)
         self.circle_chart(top10,avg_score)
+        plt.show()
 
     def rating_distribution(self,top10, avg_score):
         fig, axs = plt.subplots(5, 2, figsize=(15, 25))
@@ -253,6 +257,7 @@ class Solution(Reader):
 
     def classify(self, doc):
         print(self.class0_probabilities(self.word_probs, doc))
+
 
 if __name__ == '__main__':
     Solution().hook()
